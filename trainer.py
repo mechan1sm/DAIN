@@ -21,7 +21,8 @@ import networks
 netName = 'DAIN_slowmotion'
 use_cuda=True
 filter_size=4
-
+SAVED_MODEL ='./model_weights/best.pth'
+NEW_MODEL = './model_weights/newbest.pth'
 
 torch.manual_seed(args.seed)
 
@@ -33,26 +34,28 @@ if use_cuda:
     print("Turn the model into CUDA")
     model = model.cuda()
 
-if not args.SAVED_MODEL==None:
-    # args.SAVED_MODEL ='../model_weights/'+ args.SAVED_MODEL + "/best" + ".pth"
-    args.SAVED_MODEL ='./model_weights/best.pth'
-    print("Fine tuning on " +  args.SAVED_MODEL)
-    if not  args.use_cuda:
-        pretrained_dict = torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage)
-        # model.load_state_dict(torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage))
-    else:
-        pretrained_dict = torch.load(args.SAVED_MODEL)
-        # model.load_state_dict(torch.load(args.SAVED_MODEL))
-    #print([k for k,v in      pretrained_dict.items()])
+### SAVED MODEL
+# args.SAVED_MODEL ='../model_weights/'+ args.SAVED_MODEL + "/best" + ".pth"
+args.
+print("Fine tuning on " +  args.SAVED_MODEL)
+if not  args.use_cuda:
+    pretrained_dict = torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage)
+    # model.load_state_dict(torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage))
+else:
+    pretrained_dict = torch.load(args.SAVED_MODEL)
+    # model.load_state_dict(torch.load(args.SAVED_MODEL))
+#print([k for k,v in      pretrained_dict.items()])
 
-    model_dict = model.state_dict()
-    # 1. filter out unnecessary keys
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    # 2. overwrite entries in the existing state dict
-    model_dict.update(pretrained_dict)
-    # 3. load the new state dict
-    model.load_state_dict(model_dict)
-    pretrained_dict = None
+model_dict = model.state_dict()
+# 1. filter out unnecessary keys
+pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+# 2. overwrite entries in the existing state dict
+model_dict.update(pretrained_dict)
+# 3. load the new state dict
+model.load_state_dict(model_dict)
+pretrained_dict = None
+### /SAVED MODEL
+
 
 if type(args.datasetName) == list:
     train_sets, test_sets = [],[]
@@ -246,7 +249,7 @@ for t in range(args.numEpoch):
         # we check the validation loss instead of training loss. OK~
     if saved_total_loss >= val_total_losses.avg:
         saved_total_loss = val_total_losses.avg
-        torch.save(model.state_dict(), args.save_path + "/best"+".pth")
+        torch.save(model.state_dict(), NEW_MODEL)
         print("\t\tBest Weights updated for decreased validation loss\n")
 
     else:
