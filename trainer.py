@@ -38,7 +38,7 @@ if use_cuda:
 # args.SAVED_MODEL ='../model_weights/'+ args.SAVED_MODEL + "/best" + ".pth"
 args.
 print("Fine tuning on " +  args.SAVED_MODEL)
-if not  args.use_cuda:
+if not  use_cuda:
     pretrained_dict = torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage)
     # model.load_state_dict(torch.load(args.SAVED_MODEL, map_location=lambda storage, loc: storage))
 else:
@@ -70,10 +70,10 @@ else:
 train_loader = torch.utils.data.DataLoader(
     train_set, batch_size = args.batch_size,
     sampler=balancedsampler.RandomBalancedSampler(train_set, int(len(train_set) / args.batch_size )),
-    num_workers= args.workers, pin_memory=True if args.use_cuda else False)
+    num_workers= args.workers, pin_memory=True if use_cuda else False)
 
 val_loader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size,
-                                         num_workers=args.workers, pin_memory=True if args.use_cuda else False)
+                                         num_workers=args.workers, pin_memory=True if use_cuda else False)
 print('{} samples found, {} train samples and {} test samples '.format(len(test_set)+len(train_set),
                                                                        len(train_set),
                                                                        len(test_set)))
@@ -151,9 +151,9 @@ for t in range(args.numEpoch):
             #(0 if t == 0 else EPOCH):#
             break
 
-        X0_half = X0_half.cuda() if args.use_cuda else X0_half
-        X1_half = X1_half.cuda() if args.use_cuda else X1_half
-        y_half = y_half.cuda() if args.use_cuda else y_half
+        X0_half = X0_half.cuda() if use_cuda else X0_half
+        X1_half = X1_half.cuda() if use_cuda else X1_half
+        y_half = y_half.cuda() if use_cuda else y_half
 
         X0 = Variable(X0_half, requires_grad= False)
         X1 = Variable(X1_half, requires_grad= False)
@@ -204,9 +204,9 @@ for t in range(args.numEpoch):
             break
 
         with torch.no_grad():
-            X0 = X0.cuda() if args.use_cuda else X0
-            X1 = X1.cuda() if args.use_cuda else X1
-            y = y.cuda() if args.use_cuda else y
+            X0 = X0.cuda() if use_cuda else X0
+            X1 = X1.cuda() if use_cuda else X1
+            y = y.cuda() if use_cuda else y
 
             diffs, offsets,filters,occlusions = model(torch.stack((X0,y,X1),dim = 0))
 
